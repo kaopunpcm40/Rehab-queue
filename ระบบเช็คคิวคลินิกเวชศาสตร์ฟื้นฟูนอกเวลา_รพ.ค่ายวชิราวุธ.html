@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตรวจสอบคิว คลินิกเวชศาสตร์ฟื้นฟู นอกเวลา - รพ.ค่ายวชิราวุธ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        army: {
+                            50: '#f2f7f2',
+                            100: '#e1ede2',
+                            600: '#2d6a3f',
+                            700: '#1e512c', // Royal Army Green
+                            800: '#143d20',
+                            900: '#0b2612',
+                        },
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .bg-army-pattern {
+            background-color: #1e512c;
+            background-image: radial-gradient(#2d6a3f 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 bg-slate-100 font-sans antialiased">
+
+    <!-- Top Announcement Disclaimer -->
+    <div class="bg-amber-600 text-white py-2.5 px-4 shadow-sm text-center text-xs md:text-sm font-medium sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-200 text-base"></i>
+            <span><strong>ข้อแนะนำ:</strong> ระบบนี้ใช้เพื่อ<strong>ตรวจสอบคิวว่างคงเหลือเท่านั้น</strong> ไม่รองรับการลงทะเบียนจองคิวออนไลน์</span>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-[41px] z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center gap-4">
+                <!-- Military Hospital Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-army-700 flex items-center justify-center text-gold-400 shadow-md shadow-army-900/20 border border-gold-500/40">
+                        <i class="fa-solid fa-user-doctor text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-army-100 text-army-800 text-[10px] font-bold px-2 py-0.5 rounded-md">นอกเวลาราชการ</span>
+                            <span class="text-xs text-slate-500 font-medium">รพ.ค่ายวชิราวุธ (ทภ.4)</span>
+                        </div>
+                        <h1 class="text-base md:text-xl font-extrabold text-slate-900 leading-tight">คลินิกเวชศาสตร์ฟื้นฟู</h1>
+                    </div>
+                </div>
+
+                <!-- Admin Auth Button -->
+                <div>
+                    <button id="auth-btn" onclick="toggleAdminModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-3.5 rounded-xl transition text-xs md:text-sm border border-slate-300">
+                        <i class="fa-solid fa-lock text-army-700" id="auth-icon"></i>
+                        <span id="auth-btn-text">ผู้ดูแลระบบ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+
+        <!-- Clinic Profile & Operating Hours Card -->
+        <section class="bg-gradient-to-r from-army-800 to-army-700 text-white rounded-3xl p-6 md:p-8 shadow-md relative overflow-hidden">
+            <div class="absolute -right-8 -bottom-8 opacity-10 text-white pointer-events-none">
+                <i class="fa-solid fa-hospital text-[220px]"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-gold-500/20 text-gold-400 border border-gold-500/30 rounded-full text-xs font-bold">
+                    <i class="fa-solid fa-shield-halved"></i> โรงพยาบาลค่ายวชิราวุธ
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+                    ตรวจสอบคิวตรวจ คลินิกเวชศาสตร์ฟื้นฟู
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-sm text-slate-200">
+                    <div class="flex items-center gap-2.5 bg-white/10 px-3.5 py-2.5 rounded-xl backdrop-blur-xs">
+                        <i class="fa-solid fa-calendar-check text-gold-400 text-lg"></i>
+                        <span>ออกตรวจเฉพาะ <strong>วันจันทร์ และ วันอังคาร</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2.5 bg-white/10 px-3.5 py-2.5 rounded-xl backdrop-blur-xs">
+                        <i class="fa-solid fa-clock text-gold-400 text-lg"></i>
+                        <span>เวลา <strong>16.30 - 20.30 น.</strong> (เว้นวันหยุดราชการ)</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 bg-white/10 px-3.5 py-2.5 rounded-xl backdrop-blur-xs sm:col-span-2">
+                        <i class="fa-solid fa-users-slash text-gold-400 text-lg"></i>
+                        <span>จำกัดจำนวนผู้ป่วย <strong>ไม่เกิน 15 คิวต่อวัน</strong></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Control Panel (Visible only when logged in as kkongwat@gmail.com) -->
+        <section id="admin-panel" class="hidden bg-amber-50 border-2 border-amber-400 rounded-3xl p-5 md:p-6 shadow-md">
+            <div class="flex items-center justify-between border-b border-amber-200 pb-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold text-amber-900">แผงจัดการคิวสำหรับผู้ดูแลระบบ</h3>
+                        <p class="text-xs text-amber-700">สิทธิ์ผู้ใช้งาน: <strong id="admin-email-display">kkongwat@gmail.com</strong></p>
+                    </div>
+                </div>
+                <button onclick="logoutAdmin()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">เลือกวันที่ต้องการปรับแก้ไข</label>
+                    <select id="admin-date-select" onchange="loadAdminForm()" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 font-medium text-sm focus:ring-2 focus:ring-army-600">
+                        <!-- Options generated dynamically -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">คิวคงเหลือ (จาก 15 คิว)</label>
+                    <div class="flex items-center gap-2">
+                        <button onclick="adjustAdminQueue(-1)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 w-10 h-10 rounded-xl font-bold text-lg">-</button>
+                        <input type="number" id="admin-remaining-input" min="0" max="15" class="w-full bg-white border border-slate-300 rounded-xl p-2 text-center font-bold text-xl text-army-700">
+                        <button onclick="adjustAdminQueue(1)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 w-10 h-10 rounded-xl font-bold text-lg">+</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">สถานะรับคิว</label>
+                    <select id="admin-status-select" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 font-medium text-sm focus:ring-2 focus:ring-army-600">
+                        <option value="open">เปิดรับคิวปกติ</option>
+                        <option value="full">คิวเต็มแล้ว</option>
+                        <option value="holiday">หยุดวันนักขัตฤกษ์ / งดตรวจ</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button onclick="saveQueueData()" class="w-full bg-army-700 hover:bg-army-800 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Date Selector & Queue Display -->
+        <section class="bg-white rounded-3xl p-5 md:p-7 border border-slate-200 shadow-sm space-y-6">
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-day text-army-700"></i>
+                        <span>เลือกรอบวันตรวจ (วันจันทร์ และ วันอังคาร)</span>
+                    </h3>
+                    <p class="text-xs text-slate-500">คลิกเลือกวันที่ต้องการตรวจสอบจำนวนคิวว่าง</p>
+                </div>
+                <div class="text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>อัปเดตข้อมูลล่าสุด: <strong id="last-update-time">วันนี้ 10:00 น.</strong></span>
+                </div>
+            </div>
+
+            <!-- Clinic Date Buttons (Mon & Tue only) -->
+            <div id="clinic-dates-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                <!-- Date buttons rendered via JavaScript -->
+            </div>
+
+            <!-- Selected Date Status Highlight Box -->
+            <div id="status-card-box" class="bg-slate-50 rounded-2xl border-2 p-6 md:p-8 transition-all">
+                <!-- Status content rendered dynamically -->
+            </div>
+
+        </section>
+
+        <!-- Appointment Details & Contact (Matching provided poster image) -->
+        <section class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm">
+            <div class="border-b border-slate-100 pb-4 mb-6">
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-plus text-army-700"></i>
+                    <span>รายละเอียดสำหรับการนัดหมาย / ขอเลื่อนนัด</span>
+                </h3>
+                <p class="text-xs md:text-sm text-slate-500 mt-1">
+                    ศูนย์นัดหมาย รพ.ค่ายวชิราวุธ จะกำหนดวันนัดให้อิงตามตารางการตรวจของแพทย์
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Left Details & Line OA Callout -->
+                <div class="lg:col-span-7 space-y-5">
+                    
+                    <div class="bg-army-700 text-white rounded-2xl p-5 shadow-sm space-y-3 relative overflow-hidden">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gold-400 text-army-900 flex items-center justify-center text-xl font-bold shrink-0">
+                                <i class="fa-brands fa-line"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base md:text-lg text-gold-400">
+                                    หากท่านมีความประสงค์ "ขอเลื่อนนัด" หรือ "ทำนัดหมาย"
+                                </h4>
+                                <p class="text-xs md:text-sm text-slate-100 leading-relaxed mt-1">
+                                    เพิ่มเพื่อนผ่านช่องทาง <strong>Line Official Account รพ.ค่ายวชิราวุธ ทภ.4</strong> 
+                                    เพื่อแจ้งรายละเอียดการเลื่อนนัดให้กับทางงานบริการศูนย์นัดได้ที่ QR Code นี้
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phone Contact Cards -->
+                    <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-phone text-army-700"></i> ติดต่อสอบถาม แผนกศูนย์นัด
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <a href="tel:075809581" class="block bg-white p-3 rounded-xl border border-slate-200 hover:border-army-600 transition">
+                                <div class="text-xs text-slate-500">โทรศัพท์พื้นฐาน</div>
+                                <div class="font-bold text-army-700 text-sm md:text-base">075-809581</div>
+                                <div class="text-[11px] text-slate-400">ต่อ 1102-1105</div>
+                            </a>
+                            <a href="tel:0909881970" class="block bg-white p-3 rounded-xl border border-slate-200 hover:border-army-600 transition">
+                                <div class="text-xs text-slate-500">เบอร์โทรศัพท์สายตรง</div>
+                                <div class="font-bold text-army-700 text-sm md:text-base">090-9881970 ถึง 73</div>
+                                <div class="text-[11px] text-slate-400">ศูนย์นัดหมาย</div>
+                            </a>
+                        </div>
+                        
+                        <div class="pt-2 border-t border-slate-200 text-xs text-slate-600 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-regular fa-clock text-army-600"></i>
+                                <span><strong>วันจันทร์ - ศุกร์:</strong> ตั้งแต่เวลา 08:00 - 20:00 น.</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-regular fa-clock text-amber-600"></i>
+                                <span><strong>วันเสาร์ - อาทิตย์:</strong> ตั้งแต่เวลา 09:00 - 16:00 น.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right QR Code Area -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-50 border border-slate-200 rounded-3xl text-center space-y-3">
+                    <div class="w-48 h-48 bg-white p-3 rounded-2xl shadow-md border border-slate-200 flex flex-col items-center justify-center relative">
+                        <!-- Custom SVG QR Code Placeholder mimicking LINE Official -->
+                        <svg class="w-full h-full text-slate-800" viewBox="0 0 100 100" fill="currentColor">
+                            <path d="M0 0h35v35H0zM5 5v25h25V5zm5 5h15v15H10zM65 0h35v35H65zM70 5v25h25V5zm5 5h15v15H75zM0 65h35v35H0zM5 70v25h25V70zm5 5h15v15H10zM40 10h15v15H40zM45 40h10v20H45zM60 45h25v10H60zM40 70h15v25H40zM70 70h25v25H70z"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="bg-emerald-600 text-white px-2 py-1 rounded-md text-[10px] font-bold shadow-md">
+                                LINE @ทภ.4
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">
+                            <i class="fa-brands fa-line mr-1"></i> สแกนเพื่อเพิ่มเพื่อนใน LINE
+                        </span>
+                        <p class="text-xs text-slate-500 mt-2">Line Official Account รพ.ค่ายวชิราวุธ ทภ.4</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Admin Login Modal Dialog -->
+    <div id="admin-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl space-y-5 relative">
+            <button onclick="toggleAdminModal()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-600 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-army-700 text-gold-400 flex items-center justify-center mx-auto text-xl shadow-md">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">เข้าสู่ระบบสำหรับผู้ดูแล</h3>
+                <p class="text-xs text-slate-500">สำหรับแก้ไขจำนวนคิวเฉพาะผู้ได้รับอนุญาตเท่านั้น</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">อีเมลผู้ดูแลระบบ</label>
+                    <input type="email" id="login-email" required placeholder="kkongwat@gmail.com" value="kkongwat@gmail.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-army-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-army-600 focus:outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-army-700 hover:bg-army-800 text-white font-bold py-3 rounded-xl shadow-md transition text-sm">
+                    เข้าสู่ระบบ (Login)
+                </button>
+            </form>
+            <div class="text-center text-[11px] text-slate-400">
+                สิทธิ์อนุญาตเฉพาะ: kkongwat@gmail.com
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 pointer-events-none"></div>
+
+    <script>
+        // Authorized Admin Email Constraint
+        const ALLOWED_ADMIN = "kkongwat@gmail.com";
+        const MAX_DAILY_QUEUE = 15;
+        
+        let isAdminLoggedIn = false;
+        let selectedDateKey = "";
+        
+        // Mock State Store (Key: YYYY-MM-DD -> { remaining: number, status: 'open'|'full'|'holiday' })
+        let queueStore = JSON.parse(localStorage.getItem('vachirawut_rehab_queues') || '{}');
+
+        // Thai Month & Day Names
+        const thaiDays = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+        const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+
+        // Generate next 8 upcoming clinic days (Mondays & Tuesdays only)
+        let clinicDates = [];
+
+        function initDates() {
+            clinicDates = [];
+            let today = new Date();
+            let count = 0;
+            let iter = new Date(today);
+
+            while (count < 8) {
+                let dayOfWeek = iter.getDay();
+                // 1 = Monday, 2 = Tuesday
+                if (dayOfWeek === 1 || dayOfWeek === 2) {
+                    let yyyy = iter.getFullYear();
+                    let mm = String(iter.getMonth() + 1).padStart(2, '0');
+                    let dd = String(iter.getDate()).padStart(2, '0');
+                    let dateKey = `${yyyy}-${mm}-${dd}`;
+
+                    clinicDates.push({
+                        key: dateKey,
+                        dayName: `วัน${thaiDays[dayOfWeek]}`,
+                        dateNum: iter.getDate(),
+                        monthName: thaiMonths[iter.getMonth()],
+                        fullText: `วัน${thaiDays[dayOfWeek]}ที่ ${iter.getDate()} ${thaiMonths[iter.getMonth()]} ${yyyy + 543}`
+                    });
+
+                    // Initialize store defaults if empty
+                    if (!queueStore[dateKey]) {
+                        queueStore[dateKey] = {
+                            remaining: 15,
+                            status: 'open'
+                        };
+                    }
+                    count++;
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
+
+            if (clinicDates.length > 0) {
+                selectedDateKey = clinicDates[0].key;
+            }
+
+            saveStore();
+        }
+
+        function saveStore() {
+            localStorage.setItem('vachirawut_rehab_queues', JSON.stringify(queueStore));
+        }
+
+        window.onload = function() {
+            initDates();
+            renderDateButtons();
+            renderSelectedDateStatus();
+            renderAdminSelectOptions();
+        };
+
+        // Render Date Filter Buttons (Only Mon & Tue)
+        function renderDateButtons() {
+            const container = document.getElementById('clinic-dates-container');
+            container.innerHTML = clinicDates.map((item, index) => {
+                const isSelected = item.key === selectedDateKey;
+                return `
+                    <button onclick="selectDate('${item.key}')" class="p-3 rounded-2xl text-center border transition flex flex-col items-center ${
+                        isSelected 
+                            ? 'bg-army-700 text-white border-army-700 shadow-md ring-2 ring-army-700/30' 
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    }">
+                        <span class="text-xs font-semibold ${isSelected ? 'text-gold-400' : 'text-slate-500'}">${item.dayName}</span>
+                        <span class="text-lg font-extrabold my-0.5">${item.dateNum}</span>
+                        <span class="text-[11px] font-medium ${isSelected ? 'text-slate-200' : 'text-slate-500'}">${item.monthName}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectDate(key) {
+            selectedDateKey = key;
+            renderDateButtons();
+            renderSelectedDateStatus();
+            if (isAdminLoggedIn) {
+                document.getElementById('admin-date-select').value = key;
+                loadAdminForm();
+            }
+        }
+
+        // Render Selected Date Queue Info Box
+        function renderSelectedDateStatus() {
+            const box = document.getElementById('status-card-box');
+            const data = clinicDates.find(d => d.key === selectedDateKey);
+            const statusData = queueStore[selectedDateKey] || { remaining: 15, status: 'open' };
+
+            let borderClass = "border-emerald-300 bg-emerald-50/50";
+            let statusBadge = `<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold border border-emerald-300"><i class="fa-solid fa-circle-check mr-1"></i> เปิดรับคิวปกติ</span>`;
+            let remainingDisplay = `
+                <div class="text-center">
+                    <span class="text-xs font-bold uppercase text-slate-500 tracking-wider">คิวว่างคงเหลือ</span>
+                    <div class="text-4xl md:text-5xl font-black text-emerald-700 my-1">${statusData.remaining} <span class="text-base font-normal text-slate-500">/ 15 คิว</span></div>
+                    <p class="text-xs text-slate-500">เวลาออกตรวจ 16.30 - 20.30 น.</p>
+                </div>
+            `;
+
+            if (statusData.status === 'full' || statusData.remaining === 0) {
+                borderClass = "border-rose-300 bg-rose-50/50";
+                statusBadge = `<span class="bg-rose-100 text-rose-800 px-3 py-1 rounded-full text-xs font-bold border border-rose-300"><i class="fa-solid fa-circle-xmark mr-1"></i> คิวเต็มแล้ว</span>`;
+                remainingDisplay = `
+                    <div class="text-center">
+                        <span class="text-xs font-bold uppercase text-slate-500 tracking-wider">สถานะคิว</span>
+                        <div class="text-3xl md:text-4xl font-extrabold text-rose-600 my-2">เต็มแล้ว (0 คิวว่าง)</div>
+                        <p class="text-xs text-slate-500">กรุณาเลือกรอบวันตรวจถัดไป หรือติดต่อศูนย์นัด</p>
+                    </div>
+                `;
+            } else if (statusData.status === 'holiday') {
+                borderClass = "border-amber-300 bg-amber-50/50";
+                statusBadge = `<span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold border border-amber-300"><i class="fa-solid fa-ban mr-1"></i> หยุดวันนักขัตฤกษ์ / งดตรวจ</span>`;
+                remainingDisplay = `
+                    <div class="text-center">
+                        <span class="text-xs font-bold uppercase text-slate-500 tracking-wider">สถานะบริการ</span>
+                        <div class="text-2xl md:text-3xl font-extrabold text-amber-700 my-2">งดออกตรวจในวันดังกล่าว</div>
+                        <p class="text-xs text-slate-500">คลินิกนอกเวลาปิดทำการในวันหยุดราชการ</p>
+                    </div>
+                `;
+            }
+
+            box.className = `bg-white rounded-2xl border-2 p-6 md:p-8 transition-all ${borderClass}`;
+            box.innerHTML = `
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-200/60 pb-4 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">รอบวันที่เลือก</span>
+                        <h4 class="text-xl font-extrabold text-slate-900">${data ? data.fullText : ''}</h4>
+                    </div>
+                    <div>${statusBadge}</div>
+                </div>
+                ${remainingDisplay}
+            `;
+        }
+
+        // Admin Modal Controls
+        function toggleAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+
+            if (email.toLowerCase() === ALLOWED_ADMIN.toLowerCase()) {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-email-display').textContent = email;
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('auth-btn-text').textContent = "ผู้ดูแลระบบ (เข้าสู่ระบบแล้ว)";
+                document.getElementById('auth-icon').className = "fa-solid fa-user-check text-emerald-600";
+                toggleAdminModal();
+                loadAdminForm();
+                showToast("เข้าสู่ระบบสำเร็จ");
+            } else {
+                showToast("อีเมลนี้ไม่มีสิทธิ์เข้าถึงระบบผู้ดูแล!", true);
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('auth-btn-text').textContent = "ผู้ดูแลระบบ";
+            document.getElementById('auth-icon').className = "fa-solid fa-lock text-army-700";
+            showToast("ออกจากระบบเรียบร้อย");
+        }
+
+        function renderAdminSelectOptions() {
+            const select = document.getElementById('admin-date-select');
+            select.innerHTML = clinicDates.map(d => `<option value="${d.key}">${d.fullText}</option>`).join('');
+        }
+
+        function loadAdminForm() {
+            const key = document.getElementById('admin-date-select').value || selectedDateKey;
+            const data = queueStore[key] || { remaining: 15, status: 'open' };
+
+            document.getElementById('admin-remaining-input').value = data.remaining;
+            document.getElementById('admin-status-select').value = data.status;
+        }
+
+        function adjustAdminQueue(delta) {
+            const input = document.getElementById('admin-remaining-input');
+            let val = parseInt(input.value) || 0;
+            val = Math.max(0, Math.min(15, val + delta));
+            input.value = val;
+        }
+
+        function saveQueueData() {
+            const key = document.getElementById('admin-date-select').value;
+            const remaining = Math.max(0, Math.min(15, parseInt(document.getElementById('admin-remaining-input').value) || 0));
+            const status = document.getElementById('admin-status-select').value;
+
+            queueStore[key] = {
+                remaining: remaining,
+                status: status
+            };
+
+            saveStore();
+            renderSelectedDateStatus();
+            
+            const now = new Date();
+            document.getElementById('last-update-time').textContent = `วันนี้ ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} น.`;
+            showToast("บันทึกข้อมูลคิวสำเร็จเรียบร้อย");
+        }
+
+        function showToast(msg, isError = false) {
+            const container = document.getElementById('toast-box');
+            const toast = document.createElement('div');
+            toast.className = `text-white text-xs md:text-sm px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 transform transition-all duration-300 ${isError ? 'bg-rose-600' : 'bg-slate-900'}`;
+            toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check text-emerald-400'}"></i> <span>${msg}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
